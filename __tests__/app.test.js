@@ -18,6 +18,7 @@ describe('app routes', () => {
       const signInData = await fakeRequest(app)
         .post('/auth/signup')
         .send({
+          name: 'Jon',
           email: 'jon@user.com',
           password: '1234'
         });
@@ -31,35 +32,125 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    test('posts a location to favorites', async() => {
+      const data = {
+        city: 'royal city',
+        distance: 169,
+        state: 'wa',
+        zip_code: 90210
+      };
 
-      const expectation = [
-        {
-          'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
-        },
-        {
-          'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
-        },
-        {
-          'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
-        }
-      ];
+      const expectation = {
+        id: 4,
+        city: 'royal city',
+        distance: '169',
+        state: 'wa',
+        user_id: 2,
+        visited: false,
+        zip_code: 90210
+      };
 
-      const data = await fakeRequest(app)
-        .get('/animals')
+      const response = await fakeRequest(app)
+        .post('/api/trips')
+        .send(data)
+        .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
-
-      expect(data.body).toEqual(expectation);
+      
+      expect(response.body).toEqual(expectation);
     });
+
+    test('sets a location in favorites to visited: true', async() => {
+
+      const expectation = {
+        id: 4,
+        city: 'royal city',
+        distance: '169',
+        state: 'wa',
+        user_id: 2,
+        visited: true,
+        zip_code: 90210
+      };
+
+      const response = await fakeRequest(app)
+        .put('/api/trips/90210')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      
+      expect(response.body).toEqual(expectation);
+    });
+
+    test('gets trips by user & zip', async() => {
+
+      const expectation = [{
+        id: 4,
+        city: 'royal city',
+        distance: '169',
+        state: 'wa',
+        user_id: 2,
+        visited: true,
+        zip_code: 90210
+      }];
+
+      const response = await fakeRequest(app)
+        .get('/api/trips')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      
+      expect(response.body).toEqual(expectation);
+    });
+
+    test('gets specific city by zip', async() => {
+
+      const expectation = {
+        id: 4,
+        city: 'royal city',
+        distance: '169',
+        state: 'wa',
+        user_id: 2,
+        visited: true,
+        zip_code: 90210
+      };
+
+      const response = await fakeRequest(app)
+        .get('/api/trips/90210')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      
+      expect(response.body).toEqual(expectation);
+    });
+
+    test('deletes specific city by zip', async() => {
+
+      const expectation = {
+        id: 4,
+        city: 'royal city',
+        distance: '169',
+        state: 'wa',
+        user_id: 2,
+        visited: true,
+        zip_code: 90210
+      };
+
+      const response = await fakeRequest(app)
+        .delete('/api/trips/90210')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      
+      expect(response.body).toEqual(expectation);
+
+      const response2 = await fakeRequest(app)
+        .get('/api/trips/90210')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      
+      expect(response2.body).toEqual('');
+    });
+
   });
 });

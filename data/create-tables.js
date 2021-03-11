@@ -24,6 +24,7 @@ async function run() {
                     state VARCHAR(512) NOT NULL,
                     distance VARCHAR(512) NOT NULL,
                     visited BOOLEAN NOT NULL, 
+                    zip_code INTEGER NOT NULL,
                     user_id INTEGER NOT NULL REFERENCES users(id)
             );
         `);
