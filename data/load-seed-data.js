@@ -18,7 +18,7 @@ async function run() {
                       VALUES ($1, $2, $3)
                       RETURNING *;
                   `,
-          [user.name, user.email, user.hash]);
+        [user.name, user.email, user.hash]);
       })
     );
 
@@ -31,14 +31,17 @@ async function run() {
                       city, 
                       state, 
                       distance, 
-                      visited, 
+                      visited,
+                      zip_code, 
                       user_id)
-                    VALUES ($1, $2, $3, $4, $5);
+                    VALUES ($1, $2, $3, $4, $5, $6);
                 `,
-          [trip.city,
+        [
+          trip.city,
           trip.state,
           trip.distance,
           trip.visited,
+          trip.zip_code,
           user.id]);
       })
     );

@@ -3,7 +3,6 @@ require('dotenv').config();
 const { execSync } = require('child_process');
 
 const fakeRequest = require('supertest');
-const { request } = require('../lib/app');
 const app = require('../lib/app');
 const client = require('../lib/client');
 
@@ -38,6 +37,7 @@ describe('app routes', () => {
         city: 'royal city',
         distance: 169,
         state: 'wa',
+        zip_code: 90210
       };
 
       const expectation = {
@@ -46,7 +46,8 @@ describe('app routes', () => {
         distance: '169',
         state: 'wa',
         user_id: 2,
-        visited: false
+        visited: false,
+        zip_code: 90210
       };
 
       const response = await fakeRequest(app)
@@ -67,11 +68,12 @@ describe('app routes', () => {
         distance: '169',
         state: 'wa',
         user_id: 2,
-        visited: true
+        visited: true,
+        zip_code: 90210
       };
 
       const response = await fakeRequest(app)
-        .put('/api/trips/4')
+        .put('/api/trips/90210')
         .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
@@ -79,7 +81,7 @@ describe('app routes', () => {
       expect(response.body).toEqual(expectation);
     });
 
-    test('gets trips by user id', async() => {
+    test('gets trips by user & zip', async() => {
 
       const expectation = [{
         id: 4,
@@ -87,7 +89,8 @@ describe('app routes', () => {
         distance: '169',
         state: 'wa',
         user_id: 2,
-        visited: true
+        visited: true,
+        zip_code: 90210
       }];
 
       const response = await fakeRequest(app)
@@ -99,7 +102,7 @@ describe('app routes', () => {
       expect(response.body).toEqual(expectation);
     });
 
-    test('gets specific city by id', async() => {
+    test('gets specific city by zip', async() => {
 
       const expectation = {
         id: 4,
@@ -107,11 +110,12 @@ describe('app routes', () => {
         distance: '169',
         state: 'wa',
         user_id: 2,
-        visited: true
+        visited: true,
+        zip_code: 90210
       };
 
       const response = await fakeRequest(app)
-        .get('/api/trips/4')
+        .get('/api/trips/90210')
         .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
@@ -119,7 +123,7 @@ describe('app routes', () => {
       expect(response.body).toEqual(expectation);
     });
 
-    test('deletes specific city by id', async() => {
+    test('deletes specific city by zip', async() => {
 
       const expectation = {
         id: 4,
@@ -127,11 +131,12 @@ describe('app routes', () => {
         distance: '169',
         state: 'wa',
         user_id: 2,
-        visited: true
+        visited: true,
+        zip_code: 90210
       };
 
       const response = await fakeRequest(app)
-        .delete('/api/trips/4')
+        .delete('/api/trips/90210')
         .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
@@ -139,7 +144,7 @@ describe('app routes', () => {
       expect(response.body).toEqual(expectation);
 
       const response2 = await fakeRequest(app)
-        .get('/api/trips/4')
+        .get('/api/trips/90210')
         .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
